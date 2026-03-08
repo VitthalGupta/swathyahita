@@ -1,0 +1,14 @@
+.venv/
+.env
+.git/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.hypothesis/
+tests/
+mvp/mock_reports/
+mvp/output.json
+*.pdf
+.github/
+docs/

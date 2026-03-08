@@ -1,0 +1,33 @@
+[project]
+name = "swathyahita"
+version = "0.1.0"
+description = "Acuity-First Middleware (AFM) - Medical diagnostic report prioritization system"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.135.1",
+    "uvicorn[standard]>=0.30.0",
+    "pymupdf>=1.24.0",
+    "boto3>=1.35.0",
+    "python-multipart>=0.0.9",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "mangum>=0.19.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+    "hypothesis>=6.100.0",
+    "moto[dynamodb,s3,sqs,sns]>=5.0.0",
+    "boto3-stubs[bedrock-runtime,dynamodb,s3,sqs,sns]>=1.35.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app", "mvp"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

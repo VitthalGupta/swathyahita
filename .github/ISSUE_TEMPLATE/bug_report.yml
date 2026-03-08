@@ -1,0 +1,69 @@
+name: Bug Report
+description: Report a bug in AFM
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. Please fill out the details below.
+        **Do not include real patient data in this report.**
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      options:
+        - Report Ingestion (FHIR)
+        - PDF Extractor
+        - LLM Classifier (Bedrock)
+        - Scoring Engine
+        - Contextual Bridge
+        - Dashboard API
+        - Snooze / Escalation
+        - Notifications (SNS)
+        - Storage (DynamoDB)
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the bug
+      placeholder: What happened? What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. POST /api/reports/ingest with ...
+        2. GET /api/dashboard/prioritized
+        3. See error ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or error output
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: AFM version / commit SHA
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - Local (uvicorn)
+        - ECS Fargate
+        - AWS Lambda
+        - Other

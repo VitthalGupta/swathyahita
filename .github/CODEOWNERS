@@ -1,0 +1,11 @@
+# Default owners for all files
+* @dharma.zip/afm-team
+
+# AWS infrastructure and deployment — require infra team review
+infrastructure/ @dharma.zip/infra-team
+.github/workflows/ @dharma.zip/infra-team
+
+# Scoring engine — clinical logic, require clinical review
+app/services/scoring.py @dharma.zip/clinical-team
+app/services/contextual_bridge.py @dharma.zip/clinical-team
+app/services/classifier.py @dharma.zip/clinical-team
