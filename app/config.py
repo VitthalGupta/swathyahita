@@ -35,7 +35,7 @@ class AWSConfig:
     # Bedrock model — use Claude 3.5 Sonnet on Bedrock
     BEDROCK_MODEL_ID: str = os.getenv(
         "BEDROCK_MODEL_ID",
-        "anthropic.claude-3-5-sonnet-20241022-v2:0",
+        "us.anthropic.claude-3-7-sonnet-20250219-v1:0",
     )
 
     # Escalation settings

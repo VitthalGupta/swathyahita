@@ -161,7 +161,11 @@ Every system or clinician action produces an audit log:
 
 ## AWS IAM Permissions Required
 
-Minimum IAM policy for ECS task role / Lambda execution role:
+There are two policies depending on the use case:
+
+### Policy A — Runtime (ECS task role / Lambda execution role)
+
+Minimum permissions for the running application:
 
 ```json
 {
@@ -180,8 +184,8 @@ Minimum IAM policy for ECS task role / Lambda execution role:
     {
       "Sid": "S3",
       "Effect": "Allow",
-      "Action": ["s3:PutObject", "s3:GetObject"],
-      "Resource": "arn:aws:s3:::afm-pdf-reports/reports/*"
+      "Action": ["s3:PutObject", "s3:GetObject", "s3:GetObjectVersion"],
+      "Resource": "arn:aws:s3:::afm-pdf-reports-*/reports/*"
     },
     {
       "Sid": "Bedrock",
@@ -192,7 +196,7 @@ Minimum IAM policy for ECS task role / Lambda execution role:
     {
       "Sid": "SQS",
       "Effect": "Allow",
-      "Action": ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage"],
+      "Action": ["sqs:SendMessage", "sqs:ReceiveMessage", "sqs:DeleteMessage", "sqs:GetQueueAttributes"],
       "Resource": [
         "arn:aws:sqs:*:*:afm-processing.fifo",
         "arn:aws:sqs:*:*:afm-escalation",
@@ -207,6 +211,138 @@ Minimum IAM policy for ECS task role / Lambda execution role:
         "arn:aws:sns:*:*:afm-critical-reports",
         "arn:aws:sns:*:*:afm-escalations",
         "arn:aws:sns:*:*:afm-snooze-expiry"
+      ]
+    }
+  ]
+}
+```
+
+### Policy B — Local Developer / Setup (IAM user policy)
+
+Full permissions needed to provision infrastructure **and** run the app locally.
+Attach this to your `afm-local-dev` IAM user:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DynamoDBFull",
+      "Effect": "Allow",
+      "Action": [
+        "dynamodb:CreateTable",
+        "dynamodb:DeleteTable",
+        "dynamodb:DescribeTable",
+        "dynamodb:ListTables",
+        "dynamodb:UpdateTable",
+        "dynamodb:PutItem",
+        "dynamodb:GetItem",
+        "dynamodb:UpdateItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:Scan",
+        "dynamodb:Query",
+        "dynamodb:TagResource"
+      ],
+      "Resource": [
+        "arn:aws:dynamodb:*:*:table/afm-*",
+        "arn:aws:dynamodb:*:*:table/afm-*/index/*"
+      ]
+    },
+    {
+      "Sid": "S3BucketLevel",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket",
+        "s3:DeleteBucket",
+        "s3:ListBucket",
+        "s3:GetBucketLocation",
+        "s3:PutEncryptionConfiguration",
+        "s3:GetEncryptionConfiguration",
+        "s3:PutBucketPublicAccessBlock",
+        "s3:GetBucketPublicAccessBlock"
+      ],
+      "Resource": "arn:aws:s3:::afm-pdf-reports-*"
+    },
+    {
+      "Sid": "S3ObjectLevel",
+      "Effect": "Allow",
+      "Action": [
+        "s3:PutObject",
+        "s3:GetObject",
+        "s3:DeleteObject",
+        "s3:GetObjectVersion"
+      ],
+      "Resource": "arn:aws:s3:::afm-pdf-reports-*/*"
+    },
+    {
+      "Sid": "BedrockFull",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock:InvokeModel",
+        "bedrock:ListFoundationModels",
+        "bedrock:GetFoundationModel"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "SQSFull",
+      "Effect": "Allow",
+      "Action": [
+        "sqs:CreateQueue",
+        "sqs:DeleteQueue",
+        "sqs:GetQueueUrl",
+        "sqs:GetQueueAttributes",
+        "sqs:SetQueueAttributes",
+        "sqs:ListQueues",
+        "sqs:SendMessage",
+        "sqs:ReceiveMessage",
+        "sqs:DeleteMessage",
+        "sqs:PurgeQueue",
+        "sqs:TagQueue"
+      ],
+      "Resource": "arn:aws:sqs:*:*:afm-*"
+    },
+    {
+      "Sid": "SNSFull",
+      "Effect": "Allow",
+      "Action": [
+        "sns:CreateTopic",
+        "sns:DeleteTopic",
+        "sns:GetTopicAttributes",
+        "sns:ListTopics",
+        "sns:SetTopicAttributes",
+        "sns:Subscribe",
+        "sns:Unsubscribe",
+        "sns:Publish",
+        "sns:TagResource"
+      ],
+      "Resource": "arn:aws:sns:*:*:afm-*"
+    },
+    {
+      "Sid": "STSCallerIdentity",
+      "Effect": "Allow",
+      "Action": ["sts:GetCallerIdentity"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "IAMRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:AttachRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:GetRole",
+        "iam:ListAttachedRolePolicies"
+      ],
+      "Resource": "arn:aws:iam::025988852752:role/afm-*"
+    },
+    {
+      "Sid": "IAMPassRole",
+      "Effect": "Allow",
+      "Action": ["iam:PassRole"],
+      "Resource": [
+        "arn:aws:iam::025988852752:role/afm-ecs-task-role",
+        "arn:aws:iam::025988852752:role/afm-ecs-execution-role"
       ]
     }
   ]

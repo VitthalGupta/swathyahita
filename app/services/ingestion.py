@@ -46,8 +46,13 @@ def validate_fhir(data: dict) -> FHIRIngestRequest:
         for cat in category:
             if isinstance(cat, dict):
                 for coding in cat.get("coding", []):
-                    codes.append(coding.get("code", ""))
-        category = next((c for c in codes if c in VALID_CATEGORIES), category[0] if category else "")
+                    codes.append(coding.get("code", "").upper())
+                text = cat.get("text", "").upper()
+                if text:
+                    codes.append(text)
+        category = next((c for c in codes if c in VALID_CATEGORIES), "")
+    if isinstance(category, str):
+        category = category.upper()
     if category not in VALID_CATEGORIES:
         raise FHIRValidationError(
             f"Invalid category '{category}'. Must be one of: {', '.join(VALID_CATEGORIES)}"

@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from app.models import Report, Severity
 from app.store import store
@@ -20,7 +20,7 @@ def adjust_score_with_history(report: Report) -> tuple[int, int]:
         (adjusted_score, adjustment): final score and delta applied
     """
     base_score = report.urgency_score
-    cutoff = datetime.utcnow() - timedelta(days=HISTORY_WINDOW_DAYS)
+    cutoff = datetime.now(timezone.utc) - timedelta(days=HISTORY_WINDOW_DAYS)
 
     prior_reports = [
         r for r in store.get_patient_reports(report.patient_id)
